@@ -6,10 +6,6 @@ const startup = mojo => new Promise((resolve, reject) => {
 	const port = process.env.PORT
 	const app = mojo()
 
-	process.argv.forEach(function (val, index, array) {
-  		console.log(index + ': ' + val);
-	})
-
 	mapRoutes(app)
 	resolve({ app, calc })
 }); const start = startup

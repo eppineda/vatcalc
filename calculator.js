@@ -2,7 +2,7 @@ import console from './my-console.js'
 
 const start = filespec => {
 	console.log('calculator started')
-	loadRates(filespec).then(call => {
+	loadRates(filespec).then(rates => {
 	}).catch(err => {
 		console.error(err)
 	})
@@ -23,6 +23,8 @@ const loadRates = filespec => new Promise((resolve, reject) => {
 
 	console.log(`loading ${ filespec }...`)
 	const rates = undefined // todo: finish
+
+	if (!rates) reject(`finish reading rates from ${ filespec }`)
 	resolve(rates)	
 })
 

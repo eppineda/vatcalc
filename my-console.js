@@ -27,7 +27,7 @@ console.info = msg => {
 }
 
 console.debug = msg => {
-	original.debug(chalk.bgCyan(msg))
+	original.debug(chalk.bgBlack(msg))
 }
 
 console.assert = msg => {

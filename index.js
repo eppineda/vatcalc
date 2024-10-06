@@ -3,9 +3,16 @@ import mojo from '@mojojs/core'
 import console from './my-console.js'
 import server from './server.js'
 
+let rateFile
+
+process.argv.forEach(function (val, index, array) {
+	console.debug(index + ': ' + val);
+	if (3 === index) rateFile = val
+})
+
 server.start(mojo).then(({ app, calc }) => {
 	app.start()
-	calc.start(/* rate file e.g. rates2024.json */)
+	calc.start(rateFile)
 
 	while (calc.running()) {
 	}
