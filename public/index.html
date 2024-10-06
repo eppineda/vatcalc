@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>vatcalc REST API</title>
+</head>
+<body>
+	<h1>vatcalc</h1>
+	<p>Example:</p>
+	<ul>
+		<li>http://mydomain.com/sc - yields the tax rate for South Carolina</li>
+		<li>http://mydomain.com/gb - yields the vat rate for Great Britain</li>
+		<li>http://mydomain.com/jp?subtotal=100.50 - you can optionally calculate the tax for the specified region</li>
+	</ul>
+	<p>Responses are formatted as JSON, e.g.</p>
+	<code>
+	{ rate: 0.08, location: "Florida", locationAbbreviated: "FL" }
+	</code>
+	<p>Or, when calculating the tax</p>
+	<code>
+	{ rate: 15.00, location: "Australia", locationAbbreviated: "AUS", subtotal: 100.00, tax: 15.00,  }
+	</code>
+</body>
+</html>
