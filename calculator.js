@@ -1,3 +1,4 @@
+import { loadJsonFile } from 'load-json-file'
 import console from './my-console.js'
 
 const start = filespec => {
@@ -18,13 +19,13 @@ const addObserver = who => new Promise((resolve, reject) => {
 	if (!who) reject(`invalid observer: ${ JSON.stringify(who) }`)
 })
 
-const loadRates = filespec => new Promise((resolve, reject) => {
+const loadRates = filespec => new Promise(async (resolve, reject) => {
 	if (!filespec) reject('no rate file specified')
 
 	console.log(`loading ${ filespec }...`)
-	const rates = undefined // todo: finish
+	const rates = await loadJsonFile(filespec); console.debug(JSON.stringify(rates))
 
-	if (!rates) reject(`finish reading rates from ${ filespec }`)
+	if (!rates) reject(`finish reading rates from ${ filespec }\n${ console.trace() }`)
 	resolve(rates)	
 })
 
