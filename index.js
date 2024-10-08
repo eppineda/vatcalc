@@ -10,14 +10,8 @@ process.argv.forEach(function (val, index, array) {
 	if (3 === index) rateFile = val
 })
 
-server.start(mojo).then(({ app, calc }) => {
+server.start(mojo, rateFile).then(app => {
 	app.start()
-	calc.start(rateFile)
-
-	while (calc.running()) {
-	}
-
-	calc.stop()
 }).catch(msg => {
 	console.error(msg)
 })
