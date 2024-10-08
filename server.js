@@ -55,33 +55,28 @@ const mapRoutes = async (app, filespec) => {
 		const UNITEDSTATES = 'United States'
 		const RATES_EU = rates[EUROPE]; console.debug(JSON.stringify(RATES_EU))
 		const RATES_US = rates[UNITEDSTATES]; console.debug(JSON.stringify(RATES_US))
-
-		app.get('/Europe/:country', async ctx => {
-			const params = await ctx.params(); console.debug(`${ ctx.req.path } with params ${ params }`)
-			const country = ctx.req.path.split('/')[2]; console.debug(country)
-			const response = {}; const json = {}
-
-			json['location'] = country
-			json['rate'] = RATES_EU[country]
-
-			response['json'] = json
-			response['status'] = 200; console.debug(JSON.stringify(response))
-			ctx.render(response)
-		})
-		app.get('/Europe/:country/:subtotal', async ctx => {
-			const params = await ctx.params(); console.debug(`${ ctx.req.path } with params ${ params }`)
-			const country = ctx.req.path.split('/')[2]; console.debug(country)
-			const subtotal = ctx.req.path.split('/')[3]; console.debug(subtotal)
+		const responseEU = async (ctx, subtotal) => {
+			const params = await ctx.params()//; console.debug(`${ ctx.req.path } with params ${ params }`)
+			const country = ctx.req.path.split('/')[2]//; console.debug(country)
 			const response = {}; const json = {}
 			const calculateTax = (subtotal, rate) => subtotal * rate
 
 			json['location'] = country
 			json['rate'] = RATES_EU[country]
-			json['tax'] = calculateTax(subtotal, json['rate'])
+
+			if (subtotal) json['tax'] = calculateTax(subtotal, json['rate'])
 
 			response['json'] = json
 			response['status'] = 200; console.debug(JSON.stringify(response))
 			ctx.render(response)
+		}
+
+		app.get('/Europe/:country', ctx => {
+			responseEU(ctx)
+		})
+		app.get('/Europe/:country/:subtotal', async ctx => {
+			const subtotal = ctx.req.path.split('/')[3]; console.debug(subtotal)
+			responseEU(ctx, subtotal)
 		})
 	}).catch(err => {
 		throw new Error(err)
