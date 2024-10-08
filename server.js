@@ -50,13 +50,14 @@ const mapRoutes = async (app, filespec) => {
 	app.get('/', async ctx => {
 		await ctx.sendFile(ctx.home.child('public', 'index.html')) // default response for root aka public/
 	})
-	calc.start(filespec).then(rates => {
+	calc.start(filespec).then(rates => { // todo: a lot of this could be moved/managed by calculator
 		const EUROPE = 'Europe'
 		const UNITEDSTATES = 'United States'
 		const RATES_EU = rates[EUROPE]//; console.debug(JSON.stringify(RATES_EU))
 		const RATES_US = rates[UNITEDSTATES]//; console.debug(JSON.stringify(RATES_US))
-		const respondWith = async (ctx, rateTable, subtotal) => {
-			const params = await ctx.params()//; console.debug(`${ ctx.req.path } with params ${ params }`)
+		const respondWith = async (ctx, rateTable) => {
+			const params = await ctx.params(); console.debug(`${ ctx.req.path } with ${ typeof params } params ${ params }`)
+			const subtotal = params.get('subtotal'); console.debug(subtotal)
 			const country = encodeURI(ctx.req.path).split('/')[2]//; console.debug(country)
 			const response = {}; const json = {}
 			const calculateTax = (subtotal, rate) => subtotal * rate
@@ -64,7 +65,7 @@ const mapRoutes = async (app, filespec) => {
 			json['location'] = country
 			json['rate'] = rateTable[country]
 
-			if (subtotal) json['tax'] = calculateTax(subtotal, json['rate'])
+			if (subtotal) json['tax'] = calculateTax(subtotal, json['rate']).toFixed(2)
 
 			response['json'] = json
 			response['status'] = 200; console.debug(JSON.stringify(response))
@@ -72,18 +73,11 @@ const mapRoutes = async (app, filespec) => {
 		}
 
 		app.get('/Europe/:country', ctx => {
+			const subtotal = ctx.req.p
 			respondWith(ctx, RATES_EU)
-		})
-		app.get('/Europe/:country/:subtotal', ctx => {
-			const subtotal = encodeURI(ctx.req.path).split('/')[3]; console.debug(subtotal) // todo: cannot handle decimal in URI
-			respondWith(ctx, RATES_EU, subtotal)
 		})
 		app.get('/United States/:state', ctx => {
 			respondWith(ctx, RATES_US)
-		})
-		app.get('/United States/:state/:subtotal', ctx => {
-			const subtotal = encodeURI(ctx.req.path).split('/')[3]; console.debug(subtotal) // todo: cannot handle decimal in URI
-			respondWith(ctx, RATES_US, subtotal)
 		})
 	}).catch(err => {
 		throw new Error(err)
