@@ -2,12 +2,12 @@ import { readdir } from 'fs/promises'
 import console from './my-console.js'
 import calc from './calculator.js'
 
-const startup = mojo => new Promise((resolve, reject) => {
+const startup = (mojo, filespec) => new Promise((resolve, reject) => {
 	const port = process.env.PORT
 	const app = mojo()
 
-	mapRoutes(app)
-	resolve({ app, calc })
+	mapRoutes(app, filespec)
+	resolve(app)
 }); const start = startup
 
 const handleExit = (signal = 0) => {
@@ -44,11 +44,47 @@ const listFilesAsync = async (path, wildcards) => {
 	return found
 }
 
-const mapRoutes = async app => {
+const mapRoutes = async (app, filespec) => {
 	const router = app.router
 
 	app.get('/', async ctx => {
 		await ctx.sendFile(ctx.home.child('public', 'index.html')) // default response for root aka public/
+	})
+	calc.start(filespec).then(rates => {
+		const EUROPE = 'Europe'
+		const UNITEDSTATES = 'United States'
+		const RATES_EU = rates[EUROPE]; console.debug(JSON.stringify(RATES_EU))
+		const RATES_US = rates[UNITEDSTATES]; console.debug(JSON.stringify(RATES_US))
+
+		app.get('/Europe/:country', async ctx => {
+			const params = await ctx.params(); console.debug(`${ ctx.req.path } with params ${ params }`)
+			const country = ctx.req.path.split('/')[2]; console.debug(country)
+			const response = {}; const json = {}
+
+			json['location'] = country
+			json['rate'] = RATES_EU[country]
+
+			response['json'] = json
+			response['status'] = 200; console.debug(JSON.stringify(response))
+			ctx.render(response)
+		})
+		app.get('/Europe/:country/:subtotal', async ctx => {
+			const params = await ctx.params(); console.debug(`${ ctx.req.path } with params ${ params }`)
+			const country = ctx.req.path.split('/')[2]; console.debug(country)
+			const subtotal = ctx.req.path.split('/')[3]; console.debug(subtotal)
+			const response = {}; const json = {}
+			const calculateTax = (subtotal, rate) => subtotal * rate
+
+			json['location'] = country
+			json['rate'] = RATES_EU[country]
+			json['tax'] = calculateTax(subtotal, json['rate'])
+
+			response['json'] = json
+			response['status'] = 200; console.debug(JSON.stringify(response))
+			ctx.render(response)
+		})
+	}).catch(err => {
+		throw new Error(err)
 	})
 
 // all static web files under public/
@@ -89,6 +125,8 @@ const mapRoutes = async app => {
 				await ctx.sendFile(ctx.home.child('public', response))
 			})
 		})
+	}).catch(err => {
+		throw new Error(err)
 	})
 }
 
