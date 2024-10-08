@@ -56,18 +56,6 @@ const mapRoutes = async app => {
 		const promises = []
 		const dirs = [
 			'./public',
-/*
-			'./public/data',
-			'./public/bootstrap/css',
-			'./public/bootstrap/js',
-			'./public/bootstrap/themes/cerulean',
-			'./public/bootstrap/themes/cosmo',
-			'./public/bootstrap/themes/lumen',
-			'./public/bootstrap/themes/minty',
-			'./public/bootstrap/themes/morph',
-			'./public/bootstrap/themes/sketchy',
-			'./public/bootstrap/themes/slate',
-*/
 		].forEach(async path => {
 			const allowed = [
 				/.html/,
