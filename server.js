@@ -53,16 +53,16 @@ const mapRoutes = async (app, filespec) => {
 	calc.start(filespec).then(rates => {
 		const EUROPE = 'Europe'
 		const UNITEDSTATES = 'United States'
-		const RATES_EU = rates[EUROPE]; console.debug(JSON.stringify(RATES_EU))
-		const RATES_US = rates[UNITEDSTATES]; console.debug(JSON.stringify(RATES_US))
-		const responseEU = async (ctx, subtotal) => {
+		const RATES_EU = rates[EUROPE]//; console.debug(JSON.stringify(RATES_EU))
+		const RATES_US = rates[UNITEDSTATES]//; console.debug(JSON.stringify(RATES_US))
+		const respondWith = async (ctx, rateTable, subtotal) => {
 			const params = await ctx.params()//; console.debug(`${ ctx.req.path } with params ${ params }`)
-			const country = ctx.req.path.split('/')[2]//; console.debug(country)
+			const country = encodeURI(ctx.req.path).split('/')[2]//; console.debug(country)
 			const response = {}; const json = {}
 			const calculateTax = (subtotal, rate) => subtotal * rate
 
 			json['location'] = country
-			json['rate'] = RATES_EU[country]
+			json['rate'] = rateTable[country]
 
 			if (subtotal) json['tax'] = calculateTax(subtotal, json['rate'])
 
@@ -72,11 +72,18 @@ const mapRoutes = async (app, filespec) => {
 		}
 
 		app.get('/Europe/:country', ctx => {
-			responseEU(ctx)
+			respondWith(ctx, RATES_EU)
 		})
-		app.get('/Europe/:country/:subtotal', async ctx => {
-			const subtotal = ctx.req.path.split('/')[3]; console.debug(subtotal)
-			responseEU(ctx, subtotal)
+		app.get('/Europe/:country/:subtotal', ctx => {
+			const subtotal = encodeURI(ctx.req.path).split('/')[3]; console.debug(subtotal) // todo: cannot handle decimal in URI
+			respondWith(ctx, RATES_EU, subtotal)
+		})
+		app.get('/United States/:state', ctx => {
+			respondWith(ctx, RATES_US)
+		})
+		app.get('/United States/:state/:subtotal', ctx => {
+			const subtotal = encodeURI(ctx.req.path).split('/')[3]; console.debug(subtotal) // todo: cannot handle decimal in URI
+			respondWith(ctx, RATES_US, subtotal)
 		})
 	}).catch(err => {
 		throw new Error(err)
