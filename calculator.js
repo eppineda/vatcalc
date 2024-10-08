@@ -17,7 +17,7 @@ const loadRates = filespec => new Promise(async (resolve, reject) => {
 	if (!filespec) reject('no rate file specified')
 
 	console.log(`loading ${ filespec }...`)
-	const rates = await loadJsonFile(filespec); console.debug(JSON.stringify(rates))
+	const rates = await loadJsonFile(filespec)//; console.debug(JSON.stringify(rates))
 
 	if (!rates) reject(`unable to load rates from ${ filespec }\n${ console.trace() }`)
 	resolve(rates)	
